@@ -7,10 +7,10 @@ module.exports = {
 		.setName('ruokalista')
 		.setDescription('Hakee EDUKOn tämän päivän ruuan'),
 	async execute(interaction) {
-        if(day<=4){
+        if(day<=5){
             console.log(`scraping https://www.eduko.fi/eduko/ruokalistat/ @ ${new Date()}`)
         await haeRuuat();
-	    await interaction.reply(`----\n${ruokalista[day]}\n----`);
+	    await interaction.reply(`----\n${ruokalista}\n----`);
         }
         else{
             await interaction.reply(`Tänään on viikonloppu, koululta ei saa ruokaa.`);
@@ -19,18 +19,35 @@ module.exports = {
 };
 
 var ruokalista;
-var day=(new Date().getDay())-1;
+var date=new Date();
+var day=new Date().getDay();
 
 const haeRuuat=async()=>{
-        const browser=await puppeteer.launch({
-            headless:"new",
-            defaultViewport:null
-        });
+    const mm = date.getMonth() + 1;
+    const dd = date.getDate();
+    const dayName= new Date().toLocaleDateString('fin',{weekday:"long"}).toUpperCase();
+    const query=`${dayName} ${dd}.${mm}`;
 
-        const page=await browser.newPage();
+    const browser=await puppeteer.launch({
+        headless:"new",
+        defaultViewport:null
+    });
 
-        await page.goto("https://www.eduko.fi/eduko/ruokalistat/", {waitUntil:"domcontentloaded"});
-    
+    const page=await browser.newPage();
+
+    await page.goto("https://www.eduko.fi/eduko/ruokalistat/", {waitUntil:"domcontentloaded"});
+
+    const ruoka = await page.evaluate(() => Array.from(document.querySelectorAll("b"), e => e.parentNode.innerText));
+    ruoka.forEach(ruoka => {
+        if(ruoka.includes(query)==true){
+            console.log(ruoka);
+            ruokalista=ruoka;
+        };
+    });
+
+    await browser.close();
+
+        /*
         const ruokat=await page.evaluate(()=>{
             const ma=document.querySelector('[data-id="8f2a9b1"]').childNodes[1].innerText;
     
@@ -46,8 +63,6 @@ const haeRuuat=async()=>{
     
             return lista;
         });
-    
-        await browser.close();
-
-        ruokalista=ruokat;
+        */
+    //ruokalista=ruokat;
 };
