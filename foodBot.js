@@ -78,7 +78,12 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 });
 
-global.botChannels = new Collection();
+global.botChannels;
+fs.readFile(__dirname+'/data/botChannels.json', 'utf8', async function(err, data){
+	if(err)throw err;
+	botChannels = new Collection(Object.entries(JSON.parse(data)));
+	console.log(botChannels);
+});
 
 //cron scheduled task goes here
 async function autoList() {
@@ -91,7 +96,7 @@ async function autoList() {
 	});
    }
 
-cron.schedule('* * * * *', async() => {
+cron.schedule('15 9 * * 1-5', async() => {
 	await autoList();
 });
 
