@@ -3,6 +3,7 @@ dotenv.config()
 const fs=require('fs');
 const path=require('path');
 const {Client, Collection, Events, GatewayIntentBits}=require('discord.js');
+const cron = require('node-cron');
 
 const client=new Client({intents:[
     GatewayIntentBits.Guilds,
@@ -77,5 +78,17 @@ client.on(Events.InteractionCreate, async interaction => {
 		}
 	}
 });
+
+//cron scheduled task goes here
+async function logMessage() {
+	console.log('Cron job executed at:', new Date().toLocaleString());
+	client.commands.get('ruokalista').execute();
+   }
+
+cron.schedule('* * * * *', async() => {
+	await logMessage();
+});
+
+
 
 client.login(process.env.CLIENT_TOKEN);
