@@ -33,7 +33,6 @@ for (const folder of commandFolders) {
 };
 
 client.cooldowns = new Collection();
-
 client.on(Events.InteractionCreate, async interaction => {
 	const { cooldowns } = client;
 
@@ -79,10 +78,13 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 });
 
+global.botChannel = new Collection();
+
 //cron scheduled task goes here
 async function logMessage() {
+	let channel = client.channels.cache.find(channel => channel.name.toLowerCase() === 'botspam');
 	console.log('Cron job executed at:', new Date().toLocaleString());
-	client.commands.get('ruokalista').execute();
+	client.commands.get('ruokalista').execute(null, channel);
    }
 
 cron.schedule('* * * * *', async() => {

@@ -1,21 +1,29 @@
 const puppeteer=require('puppeteer');
-const { SlashCommandBuilder } = require('discord.js');
+const {SlashCommandBuilder} = require('discord.js');
 
 module.exports = {
     cooldown:60,
 	data: new SlashCommandBuilder()
 		.setName('ruokalista')
 		.setDescription('Hakee EDUKOn tämän päivän ruuan'),
-	async execute(interaction) {
+	async execute(interaction, channel) {
         if(day<=5){
             console.log(`scraping https://www.eduko.fi/eduko/ruokalistat/ @ ${new Date()}`)
-        await haeRuuat();
-	    await interaction.reply(`----\n${ruokalista}\n----`);
+            await haeRuuat();
+            if(!interaction){
+                channel.send(`----\n${ruokalista}\n----`)
+            }
+	        else{
+                await interaction.reply(`----\n${ruokalista}\n----`);
+            };
         }
-        else{
+        if(day>=6){
+            if(!interaction){
+                return;
+            }
             await interaction.reply(`Tänään on viikonloppu, koululta ei saa ruokaa.`);
         }
-	},
+	}
 };
 
 var ruokalista;
