@@ -78,17 +78,21 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 });
 
-global.botChannel = new Collection();
+global.botChannels = new Collection();
 
 //cron scheduled task goes here
-async function logMessage() {
-	let channel = client.channels.cache.find(channel => channel.name.toLowerCase() === 'botspam');
-	console.log('Cron job executed at:', new Date().toLocaleString());
-	client.commands.get('ruokalista').execute(null, channel);
+async function autoList() {
+	global.guilds = client.guilds.cache.map(guild => guild.id);
+
+	guilds.forEach(guild=>{
+		channel=botChannels.get(guild);
+		console.log('Cron job executed at:', new Date().toLocaleString());
+		client.commands.get('ruokalista').execute(null, channel);
+	});
    }
 
 cron.schedule('* * * * *', async() => {
-	await logMessage();
+	await autoList();
 });
 
 

@@ -48,7 +48,6 @@ const haeRuuat=async()=>{
     const ruoka = await page.evaluate(() => Array.from(document.querySelectorAll("b"), e => e.parentNode.innerText));
     ruoka.forEach(ruoka => {
         if(ruoka.includes(query)==true){
-            console.log(ruoka);
             ruokalista=ruoka;
         };
     });

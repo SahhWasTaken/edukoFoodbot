@@ -15,11 +15,9 @@ module.exports = {
         const channel=interaction.options.getChannel('kanava');
         const guild=interaction.guild.id;
 
-        botChannel.set(guild,channel.id);
+        botChannels.set(guild,channel);
 
-        console.log(botChannel);
-
-        await interaction.reply(`Automaattinen ruokalistaus asetettu kanavalle ${channel}`);
+        await interaction.reply(`Automaattinen ruokalistastus asetettu kanavalle ${channel}`);
         
 	}
 };
