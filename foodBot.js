@@ -3,14 +3,22 @@ dotenv.config()
 const fs=require('fs');
 const path=require('path');
 const {Client, Collection, Events, GatewayIntentBits}=require('discord.js');
+const cron = require('node-cron');
 
 const client=new Client({intents:[
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages
 ]});
 
-client.once('ready',()=>{
-    console.log(`Logged in as ${client.user.tag}`);
+global.botChannels=new Collection;
+client.once('ready', async()=>{
+	async function updateBotChannels(){
+		const data=await fs.promises.readFile(__dirname+'/data/botChannels.json', 'utf8')
+		botChannels=new Collection(Object.entries(JSON.parse(data)));
+		console.log("Loaded server + channel pairs opted in to autoList");
+	}
+	console.log(`Logged in as ${client.user.tag}`);
+	await updateBotChannels();
 });
 
 client.commands = new Collection();
@@ -32,7 +40,6 @@ for (const folder of commandFolders) {
 };
 
 client.cooldowns = new Collection();
-
 client.on(Events.InteractionCreate, async interaction => {
 	const { cooldowns } = client;
 
@@ -77,5 +84,24 @@ client.on(Events.InteractionCreate, async interaction => {
 		}
 	}
 });
+
+//cron scheduled task goes here
+async function autoList() {
+	const guilds = client.guilds.cache.map(guild => guild.id);
+
+	guilds.forEach(key=>{
+		if(botChannels.has(key)){
+			const kanava=client.channels.cache.get(botChannels.get(key));
+			client.commands.get('ruokalista').execute(null, kanava);
+		}
+	});
+};
+
+//cron syntax: minutes hours something something days
+cron.schedule('* * * * 1-5', async() => {
+	await autoList();
+	console.log('Cron job executed at:', new Date().toLocaleString());
+});
+
 
 client.login(process.env.CLIENT_TOKEN);
