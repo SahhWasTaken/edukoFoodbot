@@ -15,7 +15,6 @@ module.exports = {
     const channel = interaction.options.getChannel('kanava');
     const guild = interaction.guild;
     botChannels.set(guild.id, channel.id);
-    console.log(botChannels);
 
     const json = JSON.stringify(Object.fromEntries(botChannels));
     await writeToJSON(json);
