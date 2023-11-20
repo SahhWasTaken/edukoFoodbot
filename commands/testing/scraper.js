@@ -6,12 +6,12 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('ruokalista')
 		.setDescription('Hakee EDUKOn tämän päivän ruuan'),
-	async execute(interaction, channel) {
+	async execute(interaction, kanava) {
         if(day<=5){
             console.log(`scraping https://www.eduko.fi/eduko/ruokalistat/ @ ${new Date()}`)
             await haeRuuat();
             if(!interaction){
-                channel.send(`----\n${ruokalista}\n----`)
+                await kanava.send(`----\n${ruokalista}\n----`)
             }
 	        else{
                 await interaction.reply(`----\n${ruokalista}\n----`);
@@ -53,23 +53,4 @@ const haeRuuat=async()=>{
     });
 
     await browser.close();
-
-        /*
-        const ruokat=await page.evaluate(()=>{
-            const ma=document.querySelector('[data-id="8f2a9b1"]').childNodes[1].innerText;
-    
-            const ti=document.querySelector('[data-id="9b07bb8"]').childNodes[1].innerText;
-    
-            const ke=document.querySelector('[data-id="3ab40bd"]').childNodes[1].innerText;
-    
-            const to=document.querySelector('[data-id="eb19dd3"]').childNodes[1].innerText;
-    
-            const pe=document.querySelector('[data-id="47f3af9"]').childNodes[1].innerText;
-    
-            const lista=[ma, ti, ke, to, pe];
-    
-            return lista;
-        });
-        */
-    //ruokalista=ruokat;
 };

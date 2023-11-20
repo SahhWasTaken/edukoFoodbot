@@ -10,8 +10,15 @@ const client=new Client({intents:[
     GatewayIntentBits.GuildMessages
 ]});
 
-client.once('ready',()=>{
-    console.log(`Logged in as ${client.user.tag}`);
+global.botChannels=new Collection;
+client.once('ready', async()=>{
+	async function updateBotChannels(){
+		const data=await fs.promises.readFile(__dirname+'/data/botChannels.json', 'utf8')
+		botChannels=new Collection(Object.entries(JSON.parse(data)));
+		console.log("Loaded server + channel pairs opted in to autoList");
+	}
+	console.log(`Logged in as ${client.user.tag}`);
+	await updateBotChannels();
 });
 
 client.commands = new Collection();
@@ -78,28 +85,23 @@ client.on(Events.InteractionCreate, async interaction => {
 	}
 });
 
-global.botChannels;
-fs.readFile(__dirname+'/data/botChannels.json', 'utf8', async function(err, data){
-	if(err)throw err;
-	botChannels = new Collection(Object.entries(JSON.parse(data)));
-	console.log(botChannels);
-});
-
 //cron scheduled task goes here
 async function autoList() {
-	global.guilds = client.guilds.cache.map(guild => guild.id);
+	const guilds = client.guilds.cache.map(guild => guild.id);
 
-	guilds.forEach(guild=>{
-		channel=botChannels.get(guild);
-		console.log('Cron job executed at:', new Date().toLocaleString());
-		client.commands.get('ruokalista').execute(null, channel);
+	guilds.forEach(key=>{
+		if(botChannels.has(key)){
+			const kanava=client.channels.cache.get(botChannels.get(key));
+			client.commands.get('ruokalista').execute(null, kanava);
+		}
 	});
-   }
+};
 
-cron.schedule('15 9 * * 1-5', async() => {
+//cron syntax: minutes hours something something days
+cron.schedule('* * * * 1-5', async() => {
 	await autoList();
+	console.log('Cron job executed at:', new Date().toLocaleString());
 });
-
 
 
 client.login(process.env.CLIENT_TOKEN);
