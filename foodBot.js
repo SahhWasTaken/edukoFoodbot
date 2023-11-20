@@ -98,7 +98,7 @@ async function autoList() {
 };
 
 //cron syntax: minutes hours something something days
-cron.schedule('* * * * 1-5', async() => {
+cron.schedule('15 9 * * 1-5', async() => {
 	await autoList();
 	console.log('Cron job executed at:', new Date().toLocaleString());
 });
