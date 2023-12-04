@@ -10,9 +10,9 @@ const client=new Client({intents:[
     GatewayIntentBits.GuildMessages
 ]});
 
-global.botChannels=new Collection;
-client.once('ready', async()=>{
-	async function updateBotChannels(){
+global.botChannels=new Collection; //create a new empty collection that will be used to store the server:channel pairs that are set to receive automatic updates
+client.once('ready', async()=>{ //once when the bot client has logged in
+	async function updateBotChannels(){ //read the 'botChannels.json' file and load it into the global 'botChannels' collection
 		const data=await fs.promises.readFile(__dirname+'/data/botChannels.json', 'utf8')
 		botChannels=new Collection(Object.entries(JSON.parse(data)));
 		console.log("Loaded server + channel pairs opted in to autoList");
@@ -21,10 +21,10 @@ client.once('ready', async()=>{
 	await updateBotChannels();
 });
 
-client.commands = new Collection();
+client.commands = new Collection(); //create a new empty collection that will be used to keep track of all of the commands the bot has available to it
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
-for (const folder of commandFolders) {
+for (const folder of commandFolders) { //populate the commands collection
 	const commandsPath = path.join(foldersPath, folder);
 	const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 	for (const file of commandFiles) {
@@ -39,8 +39,8 @@ for (const folder of commandFolders) {
 	}
 };
 
-client.cooldowns = new Collection();
-client.on(Events.InteractionCreate, async interaction => {
+client.cooldowns = new Collection(); //make a new empty collection that will keep track of command cooldowns
+client.on(Events.InteractionCreate, async interaction => { //whenever a new interaction happens
 	const { cooldowns } = client;
 
 	if (!interaction.isChatInputCommand()) return;
@@ -61,7 +61,7 @@ client.on(Events.InteractionCreate, async interaction => {
 	const defaultCooldownDuration = 3;
 	const cooldownAmount = (command.cooldown ?? defaultCooldownDuration) * 1000;
 
-	if (timestamps.has(interaction.guildId)) {
+	if (timestamps.has(interaction.guildId)) { //base cooldowns on how often the command has been used on the server
 		const expirationTime = timestamps.get(interaction.guildId) + cooldownAmount;
 
 		if (now < expirationTime) {
@@ -86,20 +86,25 @@ client.on(Events.InteractionCreate, async interaction => {
 });
 
 //cron scheduled task goes here
-async function autoList() {
-	const guilds = client.guilds.cache.map(guild => guild.id);
+async function autoList(){
+	const guilds = client.guilds.cache.map(guild => guild.id); //get a collection of all the servers the bot is on
 
-	guilds.forEach(key=>{
-		if(botChannels.has(key)){
-			const kanava=client.channels.cache.get(botChannels.get(key));
-			client.commands.get('ruokalista').execute(null, kanava);
+	guilds.forEach(key=>{ //loop through all the servers the bot is on
+		if(botChannels.has(key)){ //if the botChannels collection has the serverID
+			const kanava=client.channels.cache.get(botChannels.get(key)); //get the channelID associated with the server
+			client.commands.get('ruokalista').execute(null, kanava); //execute the '/ruokalista' command, leaving the interaction null (meaning it wasn't evoked by a user)
 		}
 	});
 };
 
 //cron syntax: minutes hours something something days
 cron.schedule('15 9 * * 1-5', async() => {
-	await autoList();
+	try{
+		await autoList();
+	}
+	catch(error){
+		console.log(error)
+	}
 	console.log('Cron job executed at:', new Date().toLocaleString());
 });
 

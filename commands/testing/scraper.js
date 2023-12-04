@@ -7,21 +7,21 @@ module.exports = {
 		.setName('ruokalista')
 		.setDescription('Hakee EDUKOn tämän päivän ruuan'),
 	async execute(interaction, kanava) {
-        if(day<=5){
+        if(day<=5){ //if it's not weekend
             console.log(`scraping https://www.eduko.fi/eduko/ruokalistat/ @ ${new Date()}`)
             await haeRuuat();
-            if(!interaction){
-                await kanava.send(`----\n${ruokalista}\n----`)
+            if(!interaction){ //If the command was not triggered by a user
+                await kanava.send(`----\n${ruokalista}\n----`) //send today's lunch menu as a message to a channel that was passed to the function
             }
-	        else{
-                await interaction.reply(`----\n${ruokalista}\n----`);
+	        else{ //if the command was evoked by a user
+                await interaction.reply(`----\n${ruokalista}\n----`); //reply to the user with today's lunch menu 
             };
         }
-        if(day>=6){
+        if(day>=6){ //if it's weekend
             if(!interaction){
-                return;
+                return; //if the command was not triggered by a user
             }
-            await interaction.reply(`Tänään on viikonloppu, koululta ei saa ruokaa.`);
+            await interaction.reply(`Tänään on viikonloppu, koululta ei saa ruokaa.`); //reply to the user if they evoked the command
         }
 	}
 };
@@ -31,24 +31,24 @@ var date=new Date();
 var day=new Date().getDay();
 
 const haeRuuat=async()=>{
-    const mm = date.getMonth() + 1;
+    const mm = date.getMonth() + 1; //months start from 0 for whatever reason, we're fixing that here
     const dd = date.getDate();
-    const dayName= new Date().toLocaleDateString('fin',{weekday:"long"}).toUpperCase();
-    const query=`${dayName} ${dd}.${mm}`;
+    const dayName= new Date().toLocaleDateString('fin',{weekday:"long"}).toUpperCase(); //we can get weekday names in Finnish with toLocaleDateString instead of having to translate them ourselves
+    const query=`${dayName} ${dd}.${mm}`; //this'll be the string that we use to pinpoint the menu item we wish to post to discord
 
-    const browser=await puppeteer.launch({
+    const browser=await puppeteer.launch({ //start a new headless puppeteer instance
         headless:"new",
         defaultViewport:null
     });
 
     const page=await browser.newPage();
 
-    await page.goto("https://www.eduko.fi/eduko/ruokalistat/", {waitUntil:"domcontentloaded"});
+    await page.goto("https://www.eduko.fi/eduko/ruokalistat/", {waitUntil:"domcontentloaded"}); //go to the page the lunch menu gets posted on
 
-    const ruoka = await page.evaluate(() => Array.from(document.querySelectorAll("b"), e => e.parentNode.innerText));
-    ruoka.forEach(ruoka => {
-        if(ruoka.includes(query)==true){
-            ruokalista=ruoka;
+    const ruoka = await page.evaluate(() => Array.from(document.querySelectorAll("b"), e => e.parentNode.innerText)); //find every <b> element within the given page, then make an array from the innerText of each <b> element's parent node
+    ruoka.forEach(ruoka => { //forEach loop goes through the array of text contents of each elements that could contain today's lunch menu
+        if(ruoka.includes(query)==true){ //if the loop finds the 'query' we determined earlier inside one of the innerTexts we are looping through
+            ruokalista=ruoka; //Store what we assume must be today's lunch menu into a variable that the 'execute' function used by the slash command can see
         };
     });
 
