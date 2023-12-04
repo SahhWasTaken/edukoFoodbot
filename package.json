@@ -1,8 +1,8 @@
 {
-  "name": "scraper_test",
+  "name": "foodbot",
   "version": "1.0.0",
   "description": "",
-  "main": "index.cjs",
+  "main": "foodBot.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,8 +12,6 @@
   "dependencies": {
     "discord.js": "^14.13.0",
     "dotenv": "^16.3.1",
-    "mysql": "^2.18.1",
-    "mysql2": "^3.6.3",
     "node-cron": "^3.0.3",
     "puppeteer": "^21.5.0"
   }
