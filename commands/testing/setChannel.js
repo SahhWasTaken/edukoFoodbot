@@ -19,9 +19,8 @@ module.exports = {
     const json = JSON.stringify(Object.fromEntries(botChannels)); //turn the global collection first into an object and then into json format
     await writeToJSON(json);
 
-    await interaction.reply(`Automaattinen ruokalistastus asetettu kanavalle ${channel}`) //send feedback about the command to the user
-      .then(console.log(`Added channel "${channel.name}" on server "${guild.name}" to receive automatic updates`)); //and log it so we can see these things "server side" too
-
+    console.log(`Added channel "${channel.name}" on server "${guild.name}" to receive automatic updates`); //log it so we can see these things "server side"
+    return `Automaattinen ruokalistastus asetettu kanavalle ${channel}` //send feedback about the command to the user
   }
 };
 async function writeToJSON(json){ //writes a json passed to the function into 'foodBot/data/botChannels.json'

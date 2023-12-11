@@ -15,8 +15,8 @@ module.exports = {
             const json = JSON.stringify(Object.fromEntries(botChannels)); //turn the newly updated collection first into an object and then the object into a json format
             await writeToJSON(json);
 
-            await interaction.reply(`Automaattinen ruokalistastus poistettu serveriltä ${guild.name}`) //send feedback about the command to the user
-            .then(console.log(`Removed server "${guild.name}" from receiving automatic updates`)); //and log it so we can see these things "server side" too
+            console.log(`Removed server "${guild.name}" from receiving automatic updates`); //log it so we can see these things "server side"
+            return `Automaattinen ruokalistastus poistettu serveriltä ${guild.name}`; //send feedback about the command to the user
         }
 	}
 };

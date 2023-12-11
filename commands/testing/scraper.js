@@ -14,14 +14,14 @@ module.exports = {
                 await kanava.send(`----\n${ruokalista}\n----`) //send today's lunch menu as a message to a channel that was passed to the function
             }
 	        else{ //if the command was evoked by a user
-                await interaction.reply(`----\n${ruokalista}\n----`); //reply to the user with today's lunch menu 
+                return `----\n${ruokalista}\n----`; //reply to the user with today's lunch menu 
             };
         }
         if(day>=6){ //if it's weekend
             if(!interaction){
                 return; //if the command was not triggered by a user
             }
-            await interaction.reply(`Tänään on viikonloppu, koululta ei saa ruokaa.`); //reply to the user if they evoked the command
+            return `Tänään on viikonloppu, koululta ei saa ruokaa.`; //reply to the user if they evoked the command
         }
 	}
 };
@@ -40,7 +40,6 @@ const haeRuuat=async()=>{
         headless:"new",
         defaultViewport:null
     });
-
     const page=await browser.newPage();
 
     await page.goto("https://www.eduko.fi/eduko/ruokalistat/", {waitUntil:"domcontentloaded"}); //go to the page the lunch menu gets posted on

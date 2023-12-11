@@ -74,7 +74,10 @@ client.on(Events.InteractionCreate, async interaction => { //whenever a new inte
 	setTimeout(() => timestamps.delete(interaction.guildId), cooldownAmount);
 
 	try {
-		await command.execute(interaction);
+		//await command.execute(interaction);
+		await interaction.deferReply();
+		const result = await command.execute(interaction);
+		await interaction.editReply(result);
 	} catch (error) {
 		console.error(error);
 		if (interaction.replied || interaction.deferred) {
