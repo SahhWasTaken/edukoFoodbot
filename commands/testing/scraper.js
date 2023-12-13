@@ -31,10 +31,10 @@ var date=new Date();
 var day=new Date().getDay();
 
 const haeRuuat=async()=>{
-    const mm = date.getMonth() + 1; //months start from 0 for whatever reason, we're fixing that here
-    const dd = date.getDate();
-    const dayName= new Date().toLocaleDateString('fin',{weekday:"long"}).toUpperCase(); //we can get weekday names in Finnish with toLocaleDateString instead of having to translate them ourselves
-    const query=`${dayName} ${dd}.${mm}`; //this'll be the string that we use to pinpoint the menu item we wish to post to discord
+    let mm = date.getMonth() + 1; //months start from 0 for whatever reason, we're fixing that here
+    let dd = date.getDate();
+    let dayName= new Date().toLocaleDateString('fin',{weekday:"long"}).toUpperCase(); //we can get weekday names in Finnish with toLocaleDateString instead of having to translate them ourselves
+    let query=`${dayName} ${dd}.${mm}`; //this'll be the string that we use to pinpoint the menu item we wish to post to discord
 
     const browser=await puppeteer.launch({ //start a new headless puppeteer instance
         headless:"new",
